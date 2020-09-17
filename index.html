@@ -1,0 +1,202 @@
+---
+# Feel free to add content and custom Front Matter to this file.
+# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
+
+layout: home
+background: '/img/IMG_7491.jpeg' 
+---
+<style>
+
+    .node circle {
+      cursor: pointer;
+      stroke: #000000;
+      stroke-width: 1.5px;
+    }
+    
+    .node text {
+      font: 10px sans-serif;
+      pointer-events: none;
+      text-anchor: middle;
+    }
+    
+    line.link {
+      fill: none;
+      stroke: #000000;
+      stroke-width: 1.5px;
+    }
+
+    .node:not(:hover) .nodetext {
+        display: none;
+      }
+
+    
+</style>
+
+<script type='text/javascript' src= "/assets/js/d3.v3.min.js" ></script>
+
+
+<header>
+    <h1>Browse Recipes</h1>
+    <h5 class="post-subtitle">Click to view</h5>
+</header>
+
+<div id="recipe-svg" ></div> 
+
+<header>
+    <h1>Recent Recipes</h1>
+</header>
+
+<script>
+//https://bl.ocks.org/mbostock/1093130
+//https://bl.ocks.org/mbostock/950642
+//https://github.com/finnqiao/recipe_network/tree/master/recipe_network_d3
+//http://bl.ocks.org/eesur/be2abfb3155a38be4de4
+var width = 609.98;
+
+var svg = d3.select("#recipe-svg")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", screen.availHeight/2);
+    //.append("g");
+
+var force = d3.layout.force()
+    .linkDistance(150)
+    .charge(-120)
+    .gravity(.01)
+    .size([width, screen.availHeight/2])
+    .on("tick", tick);
+
+var link = svg.selectAll(".link"),
+    node = svg.selectAll(".node");
+    
+var root;
+d3.json("/assets/network.json", function(error, json) {
+  if (error) throw error;
+
+  root = json;
+  update();
+});
+
+function update() {
+  var nodes = flatten(root),
+      links = d3.layout.tree().links(nodes);
+
+  // Restart the force layout.
+  force
+      .nodes(nodes)
+      .links(links)
+      .start();
+
+  // Update links.
+  link = link.data(links, function(d) { return d.target.id; });
+
+  link.exit().remove();
+
+  link.enter().insert("line", ".node")
+      .attr("class", "link");
+
+  // Update nodes.
+  node = node.data(nodes, function(d) { return d.id; });
+
+  node.exit().remove();
+
+  var nodeEnter = node.enter().append("g")
+      .attr("class", "node")
+      .on("click", click)
+      .call(force.drag);
+
+  nodeEnter.append("circle")
+      .attr("r", 20);
+  
+  nodeEnter.append("image")
+      .attr("xlink:href", function(d) { if (d.image) {return "/img/"+d.image}})
+      .attr("x", -20)
+      .attr("y", -20)
+      .attr("width", 40)
+      .attr("height", 40)
+      .on( 'mouseenter', function() {
+            // select element in current context
+            d3.select( this )
+              .transition()
+              .attr("x", function(d) { return -100;})
+              .attr("y", function(d) { return -100;})
+              .attr("height", 200)
+              .attr("width", 200);
+          })
+          // set back
+          .on( 'mouseleave', function() {
+            d3.select( this )
+              .transition()
+              .attr("x", function(d) { return -20;})
+              .attr("y", function(d) { return -20;})
+              .attr("height", 40)
+              .attr("width", 40);
+          });
+
+  nodeEnter.append("text")
+      .attr("class","nodetext")
+      .attr("dy", ".35em")
+      .text(function(d) { return d.name; });
+
+
+  nodeEnter.append("text")
+      .attr("dy", ".35em")
+      .text(function(d) { return d.category; });
+
+  node.select("circle")
+      .style("fill", color);
+}
+
+function tick() {
+  link.attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+
+  node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+}
+
+function color(d) {
+  return d._children ? "#007e97" // collapsed package
+      : d.children ? "#0085a0" // expanded package
+      : "#fd8d3c"; // leaf node
+}
+
+function url(link) {
+		var url = '/jekyll/update/'+link 
+		window.location = url;
+}
+
+// Toggle children on click.
+function click(d) {
+  if (d3.event.defaultPrevented) return; // ignore drag
+  
+  if (d.children) {
+    d._children = d.children;
+    d.children = null;
+  } else {
+    d.children = d._children;
+    d._children = null;
+  }
+  update();
+
+  // Link:
+  if (d.link){
+    url(d.link)
+  }
+
+}
+// Returns a list of all nodes under the root.
+function flatten(root) {
+  var nodes = [], i = 0;
+
+  function recurse(node) {
+    if (node.children) node.children.forEach(recurse);
+    if (!node.id) node.id = ++i;
+    nodes.push(node);
+  }
+
+  recurse(root);
+  return nodes;
+}
+</script>
