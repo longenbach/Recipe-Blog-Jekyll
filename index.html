@@ -29,10 +29,10 @@ background: '/img/IMG_7491.jpeg'
         display: none;
       }
 
-    
+      
 </style>
 
-<script type='text/javascript' src= "/assets/js/d3.v3.min.js" ></script>
+<script type='text/javascript' src= "{{site.baseurl}}/assets/js/d3.v3.min.js" ></script>
 
 
 <header>
@@ -70,9 +70,8 @@ var link = svg.selectAll(".link"),
     node = svg.selectAll(".node");
     
 var root;
-d3.json("/assets/network.json", function(error, json) {
+d3.json("{{site.baseurl}}/assets/network.json", function(error, json) {
   if (error) throw error;
-
   root = json;
   update();
 });
@@ -109,7 +108,7 @@ function update() {
       .attr("r", 20);
   
   nodeEnter.append("image")
-      .attr("xlink:href", function(d) { if (d.image) {return "/img/"+d.image}})
+      .attr("xlink:href", function(d) { if (d.image) {return "{{site.baseurl}}/img/"+d.image}})
       .attr("x", -20)
       .attr("y", -20)
       .attr("width", 40)
@@ -163,7 +162,7 @@ function color(d) {
 }
 
 function url(link) {
-		var url = '/jekyll/update/'+link 
+		var url = '{{site.baseurl}}/jekyll/update/'+link 
 		window.location = url;
 }
 
