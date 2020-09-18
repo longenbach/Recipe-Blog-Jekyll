@@ -137,7 +137,7 @@ function update() {
 
   nodeEnter.append("circle")
       .attr("r", 20)
-      .style("opacity", 0.9);
+      .style("opacity", 0.9); // Opacity
   
   nodeEnter.append("image")
       .attr("xlink:href", function(d) { if (d.image) {return "{{site.baseurl}}/img/"+d.image}})
