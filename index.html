@@ -9,19 +9,19 @@ background: '/img/IMG_7491.jpeg'
 
     .node circle {
       cursor: pointer;
-      stroke: #000000;
+      stroke: #212529;
       stroke-width: 1.5px;
     }
     
     .node text {
-      font: 10px sans-serif;
+      font: 10px 'Open Sans';
       pointer-events: none;
       text-anchor: middle;
     }
     
     line.link {
       fill: none;
-      stroke: #000000;
+      stroke: #212529; 
       stroke-width: 1.5px;
     }
 
@@ -32,8 +32,8 @@ background: '/img/IMG_7491.jpeg'
       
 </style>
 
-<script type='text/javascript' src= "{{site.baseurl}}/assets/js/d3.v3.min.js" ></script>
-
+<script type='text/javascript' src= "{{site.baseurl}}/assets/js/d3.v3.min.js" > </script>
+<script type='text/javascript' src= "{{site.baseurl}}/assets/js/textures.js"> </script> 
 
 <header>
     <h1>Browse Recipes</h1>
@@ -65,6 +65,17 @@ var svg = d3.select("#recipe-svg")
     //.attr("width", width)
     .attr("height", height);
 
+// https://riccardoscalco.it/textures/
+var t = textures.circles()
+                .lighter(); //.thicker()
+
+svg.call(t);
+
+var background = svg.append("rect")
+                    .attr("height","100%")
+                    .style("fill", t.url());
+
+
 var force = d3.layout.force()
     //.linkDistance(150)
     .charge(-120)
@@ -90,8 +101,12 @@ function update() {
   console.log(currentWidth)
 
   svg.attr("width", currentWidth)
+  background.attr("width","100%")
+            
   force.size([currentWidth, height])
-  force.linkDistance(150)
+
+
+  force.linkDistance((currentWidth/730) * 150)
 
   var nodes = flatten(root),
       links = d3.layout.tree().links(nodes);
@@ -121,7 +136,8 @@ function update() {
       .call(force.drag);
 
   nodeEnter.append("circle")
-      .attr("r", 20);
+      .attr("r", 20)
+      .style("opacity", 0.9);
   
   nodeEnter.append("image")
       .attr("xlink:href", function(d) { if (d.image) {return "{{site.baseurl}}/img/"+d.image}})
