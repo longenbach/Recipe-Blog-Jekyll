@@ -30,7 +30,7 @@ github_username:  longenbach
 linkedin_username: sam-longenbach
 
 # Build settings
-theme: jekyll-theme-clean-blog
+theme: jekyll-theme-clean-blog #https://github.com/StartBootstrap/startbootstrap-clean-blog-jekyll
 plugins:
   - jekyll-feed
   - jekyll-paginate
@@ -42,7 +42,7 @@ paginate_path: "/posts/page:num/"
 
 remote_theme: StartBootstrap/startbootstrap-clean-blog-jekyll
 # Google Analytics
-#google_analytics:   UA-XXXXXXXXX-X
+google_analytics:   UA-178398679-1
 
 # Exclude from processing.
 # The following items will not be processed, by default.

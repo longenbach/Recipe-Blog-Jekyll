@@ -25,7 +25,7 @@ background: '/img/IMG_7491.jpeg'
       stroke-width: 1.5px;
     }
 
-    .node:not(:hover) .nodetext {
+    .node:not(:hover) .nodetext { 
         display: none;
       }
 
@@ -47,23 +47,29 @@ background: '/img/IMG_7491.jpeg'
 </header>
 
 <script>
+// Examples:
 //https://bl.ocks.org/mbostock/1093130
 //https://bl.ocks.org/mbostock/950642
+
+// .node:not(:hover) .nodetext
+//http://bl.ocks.org/eesur/be2abfb3155a38be4de4 
+
+// Ingredient Network (to do):
 //https://github.com/finnqiao/recipe_network/tree/master/recipe_network_d3
-//http://bl.ocks.org/eesur/be2abfb3155a38be4de4
+
 var width = 609.98;
+var height = screen.availHeight/1.5;
 
 var svg = d3.select("#recipe-svg")
     .append("svg")
-    .attr("width", width)
-    .attr("height", screen.availHeight/2);
-    //.append("g");
+    //.attr("width", width)
+    .attr("height", height);
 
 var force = d3.layout.force()
-    .linkDistance(150)
+    //.linkDistance(150)
     .charge(-120)
     .gravity(.01)
-    .size([width, screen.availHeight/2])
+    //.size([width, height])
     .on("tick", tick);
 
 var link = svg.selectAll(".link"),
@@ -76,7 +82,17 @@ d3.json("{{site.baseurl}}/assets/network.json", function(error, json) {
   update();
 });
 
+window.addEventListener('resize', update ); // https://www.d3-graph-gallery.com/graph/custom_responsive.html
+
 function update() {
+
+  var currentWidth = parseInt(d3.select('#recipe-svg').style('width'), 10);
+  console.log(currentWidth)
+
+  svg.attr("width", currentWidth)
+  force.size([currentWidth, height])
+  force.linkDistance(150)
+
   var nodes = flatten(root),
       links = d3.layout.tree().links(nodes);
 
